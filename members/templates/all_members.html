@@ -1,0 +1,21 @@
+{% extends "master.html" %}
+{% block title %}Members Page{% endblock %}
+
+{% block content %}
+
+<h1>Members in {{ name }}'s club</h1>
+
+<ul>
+  {% for x in mymembers %}
+    <li>
+      <a href="details/{{ x.id }}">{{ x.firstname }} {{ x.lastname }}</a>
+      {% if x.court %}
+        - Court: {{ x.court.number }}
+      {% else %}
+        - No court assigned
+      {% endif %}
+    </li>
+  {% endfor %}
+</ul>
+
+{% endblock %}

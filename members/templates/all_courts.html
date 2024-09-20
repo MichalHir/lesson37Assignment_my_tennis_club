@@ -1,0 +1,57 @@
+{% extends "master.html" %}
+{% block title %}Members Page{% endblock %}
+
+{% block content %}
+
+<h1>Courts in my club</h1>
+
+<ul>
+    {% for court in courts %}
+      <li>
+        Court: {{ court.number }}.
+        
+        <input type="checkbox" {% if court.is_occupied %}checked{% endif %} disabled>
+        
+        {% if court.is_occupied %}
+          <p>Occupied by: 
+            {% for member in court.members.all %}
+              {{ member.firstname }} {{ member.lastname }}
+              {% if not forloop.last %}, {% endif %}  <!-- Add commas between names, but not after the last one -->
+            {% endfor %}
+          </p>
+          <p>Time: {{ court.time_of_occupation|date:"H:i" }}</p>
+        {% else %}
+          <p>Occupied by: N/A</p>
+          <p>Time: N/A</p>
+        {% endif %}
+        
+        {% if not court.is_occupied %}
+          <a href="#" onclick="document.getElementById('reserve-form-{{ court.id }}').style.display='block'">Reserve</a>
+          <form id="reserve-form-{{ court.id }}" action="{% url 'reserve' court.id %}" method="post" style="display:none;">
+            {% csrf_token %}
+            <label for="member1-{{ court.id }}">Select First Member:</label>
+            <select name="member1" id="member1-{{ court.id }}" required>
+                <option value="">-- Select Member --</option>
+                {% for person in persons %}
+                    <option value="{{ person.id }}">{{ person.firstname }} {{ person.lastname }}</option>
+                {% endfor %}
+            </select>
+            <br>
+            <label for="member2-{{ court.id }}">Select Second Member:</label>
+            <select name="member2" id="member2-{{ court.id }}" required>
+                <option value="">-- Select Member --</option>
+                {% for person in persons %}
+                    <option value="{{ person.id }}">{{ person.firstname }} {{ person.lastname }}</option>
+                {% endfor %}
+            </select>
+            <br>
+            <input type="submit" value="Reserve">
+          </form>
+        {% else %}
+          <a href="{% url 'release' court.id %}">Release</a>
+        {% endif %}
+      </li>
+    {% endfor %}
+</ul>
+
+{% endblock %}
